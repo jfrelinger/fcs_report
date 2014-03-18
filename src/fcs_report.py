@@ -86,13 +86,14 @@ def report(glb, out):
             ax = fig.add_subplot(1, 1, 1)
             mean = np.array(means[j]).squeeze()
             if len(means[j]) > 1:
-                bp = ax.boxplot(mean)
+                bp = ax.boxplot(np.log10(mean))
                 set_color(bp)
             else:
-                ax.plot(np.arange(len(mean)), mean, 'b+')
+                ax.plot(np.arange(len(mean)), np.log10(mean), 'b+')
                 ax.set_xticks(np.arange(len(mean)))
                 ax.set_xlim((-1, len(mean)))
             ax.set_xticklabels(panels[j], rotation=90)
+	    ax.set_ylabel('log_10')
             fig.savefig('dist_panel_%d.png' % i)
             f.write('![distribtuion of means by channel](dist_panel_%d.png)\n' % i)
             f.write('\n')
@@ -101,6 +102,7 @@ def report(glb, out):
         for j in common:
             f.write(' * %s\n' % j)
 
+        f.write('\n')
         f.write('Laser overview:\n')
         f.write('---------------\n')
         for i in laserabs:
@@ -108,9 +110,10 @@ def report(glb, out):
             markers.sort()
             f.write('%s\t: %s\n\n' % (i, ', '.join(markers)))
         f.write('\n')
+	print 'DONE'
 
 
 if __name__ == '__main__':
     import os
-    os.chdir('/home/jolly/Projects/SDY180/data/fcs')
-    report('*.fcs', None)
+    os.chdir('/home/jolly/Projects/provide/data/provide_cytof_data_011413')
+    report('*/*.fcs', None)
