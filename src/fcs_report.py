@@ -94,6 +94,7 @@ def report(glb, out):
                 ax.set_xlim((-1, len(mean)))
             ax.set_xticklabels(panels[j], rotation=90)
 	    ax.set_ylabel('log_10')
+	    ax.set_title("Distribution of means")
             fig.savefig('dist_panel_%d.png' % i)
             f.write('![distribtuion of means by channel](dist_panel_%d.png)\n' % i)
             f.write('\n')
