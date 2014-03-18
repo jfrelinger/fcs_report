@@ -33,12 +33,16 @@ def report(glb, out):
     panel_map = {}
     means = defaultdict(list)
     nevents = defaultdict(list)
+    laserabs = defaultdict(list)
     for i in glob(glb):
         print i
         x = fcm.loadFCS(i)
         h = hsh(x)
         if h not in panels:
             panels[h] = x.long_names
+        for i in range(len(x.channels)):
+            laserabs[x.short_names[i]].append(x.channels[i])
+
         panel_map[i] = h
         means[h].append(x.mean(0))
         nevents[h].append(x.shape[0])
@@ -85,10 +89,9 @@ def report(glb, out):
                 bp = ax.boxplot(mean)
                 set_color(bp)
             else:
-                print np.arange(len(mean)),mean
-                ax.plot(np.arange(len(mean)),mean, 'b+')
+                ax.plot(np.arange(len(mean)), mean, 'b+')
                 ax.set_xticks(np.arange(len(mean)))
-                ax.set_xlim((-1,len(mean)))
+                ax.set_xlim((-1, len(mean)))
             ax.set_xticklabels(panels[j], rotation=90)
             fig.savefig('dist_panel_%d.png' % i)
             f.write('![distribtuion of means by channel](dist_panel_%d.png)\n' % i)
@@ -98,6 +101,13 @@ def report(glb, out):
         for j in common:
             f.write(' * %s\n' % j)
 
+        f.write('Laser overview:\n')
+        f.write('---------------\n')
+        for i in laserabs:
+            markers = list(set(laserabs[i]))
+            markers.sort()
+            f.write('%s\t: %s\n\n' % (i, ', '.join(markers)))
+        f.write('\n')
 
 
 if __name__ == '__main__':
