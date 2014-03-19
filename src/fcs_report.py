@@ -11,6 +11,11 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 
 
+def bin_size(t):
+    ''' automatic bin count estimation '''
+    return np.sqrt(len(t)).astype(int) + 1
+
+
 def set_color(bp):
     ''' set boxplot colors'''
     plt.setp(bp['boxes'][0], color='b')
@@ -21,6 +26,7 @@ def set_color(bp):
     plt.setp(bp['fliers'][0], color='b')
     plt.setp(bp['fliers'][1], color='b')
     plt.setp(bp['medians'][0], color='r')
+
 
 def hsh(x):
     '''create a semi-unique id out of a fcmdata object'''
@@ -59,7 +65,6 @@ def report(glb, out):
     for i in panels:
         common.intersection_update(set(panels[i]))
 
-
     with open('panels.md', 'w') as f:
         f.write('Panels\n')
         f.write('======\n')
@@ -76,7 +81,7 @@ def report(glb, out):
             fig = plt.figure()
             z = np.array(nevents[j])
             ax = fig.add_subplot(1, 1, 1)
-            ax.hist(z, bins=10, histtype='step')
+            ax.hist(z, bins=bin_size(z), histtype='step')
             ax.set_xlabel('Number of events')
             plt.tight_layout()
             fig.savefig('nevents_panel_%d.png' % i)
@@ -93,10 +98,10 @@ def report(glb, out):
                 ax.set_xticks(np.arange(len(mean)))
                 ax.set_xlim((-1, len(mean)))
             ax.set_xticklabels(panels[j], rotation=90)
-	    ax.set_ylabel(r'log_10()')
-	    ax.set_title("Distribution of Means")
-	    plt.subplots_adjust(bottom=0.8)
-	    plt.tight_layout()
+            ax.set_ylabel(r'log_10()')
+            ax.set_title("Distribution of Means")
+            plt.subplots_adjust(bottom=0.8)
+            plt.tight_layout()
             fig.savefig('dist_panel_%d.png' % i)
             f.write('![distribtuion of means by channel](dist_panel_%d.png)\n' % i)
             f.write('\n')
@@ -106,17 +111,18 @@ def report(glb, out):
             f.write(' * %s\n' % j)
 
         f.write('\n')
-        f.write('Laser overview:\n')
+        f.write('Detector overview:\n')
         f.write('---------------\n')
         for i in laserabs:
             markers = list(set(laserabs[i]))
             markers.sort()
-            f.write('%s\t: %s\n\n' % (i, ', '.join(markers)))
+            tmp = ''
+            for j in markers:
+                tmp = tmp + ', %s (%d)' % (j, laserabs[i].count(j))
+            f.write('%s\t: %s\n\n' % (i, tmp))
         f.write('\n')
-	print 'DONE'
+    print 'DONE'
 
 
 if __name__ == '__main__':
-    import os
-    os.chdir('/home/jolly/Projects/provide/data/provide_cytof_data_011413')
-    report('*/*.fcs', None)
+    pass
